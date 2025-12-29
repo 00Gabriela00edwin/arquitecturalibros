@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Trash2, Menu, X, Instagram, Facebook, Twitter } from 'lucide-react';
+import { ShoppingBag, Trash2, Instagram, Facebook, Twitter } from 'lucide-react';
 import './App.css';
 
 // --- DATOS SIMULADOS (10 Libros de Arquitectura) ---
@@ -124,7 +124,12 @@ const ProductDetail = ({ addToCart }) => {
 // 5. Página de Carrito
 const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const navigate = useNavigate();
+  
+  // Aquí podríamos agregar la lógica real de pago en el futuro
+  const handleCheckout = () => {
+    console.log("Iniciando proceso de pago...");
+    // Aquí iría la redirección a MercadoPago, Stripe, etc.
+  };
 
   return (
     <div className="container main-content cart-page">
@@ -158,7 +163,8 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
           <div className="cart-summary">
             <h3>Total Estimado: ${total.toLocaleString()}</h3>
             <p style={{fontSize:'0.8rem', color:'#666', marginBottom:'1rem'}}>Impuestos incluidos</p>
-            <button className="btn-primary" onClick={() => alert("Redirigiendo a Pasarela de Pago...")}>
+            {/* Se eliminó el alert del onClick */}
+            <button className="btn-primary" onClick={handleCheckout}>
               Proceder al Pago
             </button>
           </div>
@@ -183,7 +189,7 @@ const About = () => (
 function App() {
   const [cart, setCart] = useState([]);
 
-  // Función para agregar al carrito
+  // Función para agregar al carrito (SIN ALERT)
   const addToCart = (book) => {
     setCart(prevCart => {
       const existing = prevCart.find(item => item.id === book.id);
@@ -194,7 +200,7 @@ function App() {
       }
       return [...prevCart, { ...book, quantity: 1 }];
     });
-    alert("Libro agregado al carrito");
+    // Eliminado: alert("Libro agregado al carrito");
   };
 
   // Función para actualizar cantidad
