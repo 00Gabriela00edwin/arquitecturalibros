@@ -1,4 +1,4 @@
-/* --- Layout General --- */
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -78,7 +78,7 @@
 .hero {
   background-color: var(--text-color);
   color: white;
-  padding: 4rem 0;
+  padding: 10rem 0;
   margin-bottom: 2rem;
   text-align: center;
 }
