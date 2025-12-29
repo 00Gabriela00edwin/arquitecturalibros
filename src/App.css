@@ -1,0 +1,252 @@
+/* --- Layout General --- */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.main-content {
+  min-height: 80vh;
+  padding-top: 80px; /* Espacio para el navbar fijo */
+}
+
+/* --- Navbar --- */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 1000;
+  padding: 1rem 0;
+  backdrop-filter: blur(5px);
+}
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  border: 2px solid var(--text-color);
+  padding: 5px 10px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--accent-color);
+}
+
+.cart-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--accent-color);
+  color: white;
+  font-size: 0.7rem;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Hero & Promos --- */
+.hero {
+  background-color: var(--text-color);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* --- Catalogo (Grid) --- */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.book-card {
+  background: var(--secondary-bg);
+  border: 1px solid transparent;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.book-card:hover {
+  border-color: var(--text-color);
+  transform: translateY(-5px);
+  box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
+}
+
+.book-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  background-color: #ddd;
+}
+
+.book-info {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.book-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.book-price {
+  font-weight: 300;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--text-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  width: 100%;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background: var(--accent-color);
+}
+
+/* --- Detalle del Libro --- */
+.product-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.detail-img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border-color);
+}
+
+.detail-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* --- Carrito --- */
+.cart-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 80px 2fr 1fr 1fr 50px;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item img {
+  width: 100%;
+  height: auto;
+}
+
+.quantity-controls button {
+  padding: 5px 10px;
+  background: #eee;
+  border: none;
+  margin: 0 5px;
+}
+
+.remove-btn {
+  color: var(--accent-color);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+}
+
+.cart-summary {
+  margin-top: 2rem;
+  text-align: right;
+  padding: 2rem;
+  background: white;
+  border: 1px solid var(--border-color);
+}
+
+/* --- Footer --- */
+.footer {
+  background: var(--text-color);
+  color: #888;
+  padding: 3rem 0;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.socials {
+  display: flex;
+  gap: 1rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .socials {
+    justify-content: center;
+  }
+}

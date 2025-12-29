@@ -1,0 +1,36 @@
+:root {
+  --bg-color: #f4f4f4; /* Gris concreto claro */
+  --text-color: #1a1a1a; /* Casi negro */
+  --accent-color: #d0312d; /* Rojo ladrillo o Naranja construcción */
+  --secondary-bg: #ffffff;
+  --border-color: #cccccc;
+  --font-main: 'Space Grotesk', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  font-family: var(--font-main);
+  cursor: pointer;
+}
