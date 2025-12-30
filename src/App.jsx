@@ -1,25 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Trash2, Instagram, Facebook, Twitter } from 'lucide-react';
+import { ShoppingBag, Trash2, Instagram, Facebook, Twitter, CheckCircle, Loader } from 'lucide-react';
 import './App.css';
 
-// --- DATOS SIMULADOS (10 Libros de Arquitectura) ---
-const booksData = [
-  { id: 1, title: "Forma y Espacio", author: "Francis D.K. Ching", price: 45000, desc: "El manual clásico de introducción a la arquitectura, analizando la forma, el espacio y el orden.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Forma+Espacio" },
-  { id: 2, title: "La Arquitectura de la Ciudad", author: "Aldo Rossi", price: 38000, desc: "Un análisis fundamental sobre la construcción urbana y la memoria colectiva.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Ciudad+Rossi" },
-  { id: 3, title: "Pensar la Arquitectura", author: "Peter Zumthor", price: 52000, desc: "Reflexiones personales sobre la atmósfera, la materialidad y la belleza.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Zumthor" },
-  { id: 4, title: "Delirio de Nueva York", author: "Rem Koolhaas", price: 41000, desc: "Un manifiesto retroactivo para Manhattan. Caos y congestión como belleza.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Delirio+NY" },
-  { id: 5, title: "S,M,L,XL", author: "OMA", price: 95000, desc: "Una novela gráfica de arquitectura. Proyectos, ensayos y diarios.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=SMLXL" },
-  { id: 6, title: "Complejidad y Contradicción", author: "Robert Venturi", price: 36000, desc: "Un ataque a la pureza del modernismo. 'Menos es aburrido'.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Venturi" },
-  { id: 7, title: "La Poética del Espacio", author: "Gaston Bachelard", price: 29000, desc: "Filosofía sobre cómo habitamos los espacios y los sueños.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Poetica" },
-  { id: 8, title: "Atmósferas", author: "Peter Zumthor", price: 31000, desc: "Entornos arquitectónicos: las cosas a mi alrededor.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Atmosferas" },
-  { id: 9, title: "Hacia una Arquitectura", author: "Le Corbusier", price: 40000, desc: "Los 5 puntos de la nueva arquitectura y la máquina de habitar.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Le+Corbusier" },
-  { id: 10, title: "Historia de la Arquitectura", author: "Spiro Kostof", price: 60000, desc: "Un recorrido completo desde las cavernas hasta el siglo XX.", img: "https://placehold.co/400x600/e0e0e0/1a1a1a?text=Historia" },
-];
+// 1. IMPORTAMOS LA BASE DE DATOS Y FUNCIONES DE FIREBASE
+import { db } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
 
 // --- COMPONENTES ---
 
-// 1. Navbar
+// Navbar (Sin cambios)
 const Navbar = ({ cartCount }) => (
   <nav className="navbar">
     <div className="container nav-content">
@@ -36,7 +27,7 @@ const Navbar = ({ cartCount }) => (
   </nav>
 );
 
-// 2. Footer
+// Footer (Sin cambios)
 const Footer = () => (
   <footer className="footer">
     <div className="container footer-content">
@@ -59,8 +50,8 @@ const Footer = () => (
   </footer>
 );
 
-// 3. Página de Inicio (Home)
-const Home = ({ addToCart }) => (
+// Home (Ahora recibe la lista de libros real 'books' como prop)
+const Home = ({ books, addToCart, loading }) => (
   <>
     <header className="hero">
       <div className="container">
@@ -72,36 +63,45 @@ const Home = ({ addToCart }) => (
     <section className="container">
       <h2>Catálogo Seleccionado</h2>
       <br />
-      <div className="book-grid">
-        {booksData.map(book => (
-          <div key={book.id} className="book-card">
-            <img src={book.img} alt={book.title} className="book-image" />
-            <div className="book-info">
-              <div>
-                <h3 className="book-title">{book.title}</h3>
-                <p className="book-author">{book.author}</p>
-              </div>
-              <div>
-                <p className="book-price">${book.price.toLocaleString()}</p>
-                <div style={{display: 'flex', gap: '10px'}}>
-                  <Link to={`/book/${book.id}`} className="btn-primary" style={{textAlign:'center', background:'transparent', color:'black', border:'1px solid black'}}>Ver Detalle</Link>
-                  <button onClick={() => addToCart(book)} className="btn-primary">Comprar</button>
+      
+      {loading ? (
+        <div style={{textAlign: 'center', padding: '2rem'}}>
+          <Loader className="spin" size={40} />
+          <p>Cargando biblioteca...</p>
+        </div>
+      ) : (
+        <div className="book-grid">
+          {books.map(book => (
+            <div key={book.id} className="book-card">
+              <img src={book.img} alt={book.title} className="book-image" />
+              <div className="book-info">
+                <div>
+                  <h3 className="book-title">{book.title}</h3>
+                  <p className="book-author">{book.author}</p>
+                </div>
+                <div>
+                  <p className="book-price">${book.price ? book.price.toLocaleString() : '0'}</p>
+                  <div style={{display: 'flex', gap: '10px'}}>
+                    <Link to={`/book/${book.id}`} className="btn-primary" style={{textAlign:'center', background:'transparent', color:'black', border:'1px solid black'}}>Ver Detalle</Link>
+                    <button onClick={() => addToCart(book)} className="btn-primary">Comprar</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   </>
 );
 
-// 4. Página de Detalle de Producto
-const ProductDetail = ({ addToCart }) => {
+// Detalle de Producto (Busca en la lista real de libros)
+const ProductDetail = ({ books, addToCart }) => {
   const { id } = useParams();
-  const book = booksData.find(b => b.id === parseInt(id));
+  // Buscamos por ID de texto (Firebase) en lugar de número
+  const book = books.find(b => b.id === id);
 
-  if (!book) return <div className="container main-content">Libro no encontrado</div>;
+  if (!book) return <div className="container main-content">Cargando libro o no encontrado...</div>;
 
   return (
     <div className="container main-content">
@@ -111,7 +111,7 @@ const ProductDetail = ({ addToCart }) => {
           <h1 style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>{book.title}</h1>
           <h3 style={{color: '#666', marginBottom: '2rem'}}>{book.author}</h3>
           <p style={{fontSize: '1.2rem', lineHeight: '1.8', marginBottom: '2rem'}}>{book.desc}</p>
-          <h2 style={{fontSize: '2rem', marginBottom: '2rem'}}>${book.price.toLocaleString()}</h2>
+          <h2 style={{fontSize: '2rem', marginBottom: '2rem'}}>${book.price ? book.price.toLocaleString() : '0'}</h2>
           <button onClick={() => addToCart(book)} className="btn-primary" style={{maxWidth: '200px'}}>
             Agregar al Carrito
           </button>
@@ -121,15 +121,29 @@ const ProductDetail = ({ addToCart }) => {
   );
 };
 
-// 5. Página de Carrito
-const Cart = ({ cart, updateQuantity, removeFromCart }) => {
+// Carrito (Sin cambios en lógica, solo visual)
+const Cart = ({ cart, updateQuantity, removeFromCart, clearCart }) => {
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const navigate = useNavigate();
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   
-  // Aquí podríamos agregar la lógica real de pago en el futuro
   const handleCheckout = () => {
-    console.log("Iniciando proceso de pago...");
-    // Aquí iría la redirección a MercadoPago, Stripe, etc.
+    setIsRedirecting(true);
+    setTimeout(() => {
+      clearCart(); 
+      navigate('/success');
+    }, 2500);
   };
+
+  if (isRedirecting) {
+    return (
+      <div className="container main-content redirect-message">
+        <Loader size={48} style={{animation: 'spin 4s linear infinite', marginBottom:'1rem'}} />
+        <h2>Redirigiendo a la pasarela de pagos segura...</h2>
+        <p>No cierres esta ventana.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container main-content cart-page">
@@ -163,7 +177,6 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
           <div className="cart-summary">
             <h3>Total Estimado: ${total.toLocaleString()}</h3>
             <p style={{fontSize:'0.8rem', color:'#666', marginBottom:'1rem'}}>Impuestos incluidos</p>
-            {/* Se eliminó el alert del onClick */}
             <button className="btn-primary" onClick={handleCheckout}>
               Proceder al Pago
             </button>
@@ -174,22 +187,55 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   );
 };
 
-// 6. Página About (Nosotros)
+// Página de Éxito
+const CheckoutSuccess = () => (
+  <div className="container main-content success-page">
+    <CheckCircle size={80} className="success-icon" />
+    <h1>¡Gracias por tu compra!</h1>
+    <p>La transacción ha sido procesada correctamente.</p>
+    <Link to="/" className="btn-primary" style={{display: 'inline-block'}}>
+      Volver a la tienda
+    </Link>
+  </div>
+);
+
+// About
 const About = () => (
   <div className="container main-content">
     <h1>Sobre Nosotros</h1>
     <p style={{maxWidth: '600px', marginTop: '20px'}}>
       Somos un colectivo de arquitectos y diseñadores dedicados a difundir la literatura que construye pensamiento. 
-      Creemos que un buen libro es el cimiento de cualquier gran obra.
     </p>
   </div>
 );
 
-// --- COMPONENTE PRINCIPAL (APP) ---
+// --- APP PRINCIPAL ---
 function App() {
   const [cart, setCart] = useState([]);
+  const [books, setBooks] = useState([]); // Estado para guardar los libros de Firebase
+  const [loading, setLoading] = useState(true); // Estado de carga
 
-  // Función para agregar al carrito (SIN ALERT)
+  // EFECTO: Cargar libros desde Firebase al iniciar
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const booksCollection = collection(db, "books"); // Referencia a la colección "books"
+        const snapshot = await getDocs(booksCollection);
+        const booksList = snapshot.docs.map(doc => ({
+          id: doc.id,     // Usamos el ID automático de Firebase
+          ...doc.data()   // Y los datos (title, price, img, etc.)
+        }));
+        setBooks(booksList);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error cargando libros:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
   const addToCart = (book) => {
     setCart(prevCart => {
       const existing = prevCart.find(item => item.id === book.id);
@@ -200,10 +246,8 @@ function App() {
       }
       return [...prevCart, { ...book, quantity: 1 }];
     });
-    // Eliminado: alert("Libro agregado al carrito");
   };
 
-  // Función para actualizar cantidad
   const updateQuantity = (id, amount) => {
     setCart(prevCart => {
       return prevCart.map(item => {
@@ -216,10 +260,11 @@ function App() {
     });
   };
 
-  // Función para eliminar
   const removeFromCart = (id) => {
     setCart(prevCart => prevCart.filter(item => item.id !== id));
   };
+
+  const clearCart = () => setCart([]);
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -228,15 +273,21 @@ function App() {
       <Navbar cartCount={cartCount} />
       
       <Routes>
-        <Route path="/" element={<Home addToCart={addToCart} />} />
-        <Route path="/book/:id" element={<ProductDetail addToCart={addToCart} />} />
+        {/* Pasamos 'books' y 'loading' a Home */}
+        <Route path="/" element={<Home books={books} loading={loading} addToCart={addToCart} />} />
+        
+        {/* Pasamos 'books' al detalle también */}
+        <Route path="/book/:id" element={<ProductDetail books={books} addToCart={addToCart} />} />
+        
         <Route path="/cart" element={
           <Cart 
             cart={cart} 
             updateQuantity={updateQuantity} 
             removeFromCart={removeFromCart} 
+            clearCart={clearCart}
           />
         } />
+        <Route path="/success" element={<CheckoutSuccess />} />
         <Route path="/about" element={<About />} />
       </Routes>
 
