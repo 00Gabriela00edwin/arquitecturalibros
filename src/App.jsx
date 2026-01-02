@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Trash2, Instagram, Facebook, Twitter, CheckCircle, Loader } from 'lucide-react';
 import './App.css';
-
 // 1. IMPORTAMOS LA BASE DE DATOS Y FUNCIONES DE FIREBASE
 import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
-
+import BotonPago from './BotonPago';
 
 // --- COMPONENTES ---
 
@@ -271,7 +270,7 @@ function App() {
   return (
     <div className="app">
       <Navbar cartCount={cartCount} />
-      
+
       <Routes>
         {/* Pasamos 'books' y 'loading' a Home */}
         <Route path="/" element={<Home books={books} loading={loading} addToCart={addToCart} />} />
@@ -290,7 +289,12 @@ function App() {
         <Route path="/success" element={<CheckoutSuccess />} />
         <Route path="/about" element={<About />} />
       </Routes>
-
+ {/* --- ZONA DE PRUEBAS DE PAGO (BORRAR DESPUÉS) --- */}
+      <div style={{ backgroundColor: '#fff3cd', padding: '15px', textAlign: 'center', borderBottom: '1px solid #ffeeba' }}>
+        <span style={{ marginRight: '15px', fontWeight: 'bold', color: '#856404' }}>🔧 Test de Integración:</span>
+        <BotonPago />
+      </div>
+        {/* ------------------------------------------------ */}
       <Footer />
     </div>
   );

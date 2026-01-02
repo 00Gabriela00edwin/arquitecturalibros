@@ -12,8 +12,7 @@ const firebaseConfig = {
   measurementId: "G-D0NHKD6K7V"
 };
 
-// 1. Inicializamos la App con tus credenciales
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 // 2. Exportamos la referencia a la base de datos para usarla en App.jsx
 export const db = getFirestore(app);

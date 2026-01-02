@@ -1,39 +1,51 @@
 const functions = require("firebase-functions");
+// 1. Importamos la NUEVA sintaxis de la versión 2.x
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 
-// CONFIGURACIÓN
-// Pega tu Access Token de prueba aquí abajo entre las comillas
-const client = new MercadoPagoConfig({ accessToken: 'APP_USR-3377639008576316-122922-f1899f7f1103d52636d36baeb2b9e6cb-3100673963' });
+// 2. Configuramos el cliente (Pega tu Access Token real aquí)
+const client = new MercadoPagoConfig(
+  {accessToken:'APP_USR-3377639008576316-122922-f1899f7f1103d52636d36baeb2b9e6cb-3100673963'});
 
 exports.crearPago = functions.https.onCall(async (data, context) => {
+  // 'data' trae lo que enviaste desde el botón naranja (titulo, precio, etc.)
+  
   try {
-    // Aquí recibimos los libros desde el carrito
-    const items = data.items;
-
-    const body = {
-      items: items.map((libro) => ({
-        title: libro.titulo,       // Asegúrate que tu libro tenga 'titulo'
-        unit_price: Number(libro.precio), // El precio
-        currency_id: 'ARS',
-        quantity: 1,
-      })),
-      back_urls: {
-        success: "http://localhost:5173", // A donde vuelve si sale bien
-        failure: "http://localhost:5173", // A donde vuelve si falla
-        pending: "http://localhost:5173",
-      },
-      auto_return: "approved",
-    };
-
     const preference = new Preference(client);
-    const result = await preference.create({ body });
 
-    return {
-      init_point: result.init_point, // Este es el Link de pago
-    };
+    // 3. Creamos la preferencia de pago
+    const result = await preference.create({
+      body: {
+        items: [
+         {
+            title: data.titulo || "Libro Genérico", // Si no hay título, usa este
+            
+            // EL FIX: Si falla la conversión, usa 100 pesos por defecto
+            unit_price: Number(data.precio) || 100, 
+            
+            // EL FIX: Si falla la cantidad, usa 1 unidad por defecto
+            quantity:1,
+            
+            currency_id: "ARS"
+          }
+
+       
+        ],
+        back_urls: {
+         success: "https://www.google.com",
+          failure: "https://www.google.com",
+          pending: "https://www.google.com"
+      
+        },
+        auto_return: "approved",
+      }
+    });
+
+    // 4. Devolvemos la URL de pago al Frontend (App.jsx)
+    return { url: result.init_point };
 
   } catch (error) {
-    console.error("Error MercadoPago:", error);
-    throw new functions.https.HttpsError('internal', 'No se pudo crear el pago');
+    console.error("Error al crear preferencia:", error);
+    // Esto enviará el error detallado a tu consola del navegador
+    throw new functions.https.HttpsError('internal', 'Error al crear el pago', error);
   }
 });
