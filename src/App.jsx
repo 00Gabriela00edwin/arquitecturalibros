@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Trash2, Instagram, Facebook, Twitter, CheckCircle, Loader } from 'lucide-react';
 import './App.css';
-// 1. IMPORTAMOS LA BASE DE DATOS Y FUNCIONES DE FIREBASE
+// IMPORTAMOS LA BASE DE DATOS Y FUNCIONES DE FIREBASE
 import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import BotonPago from './BotonPago';
 
 // --- COMPONENTES ---
 
-// Navbar (Sin cambios)
+// Navbar
 const Navbar = ({ cartCount }) => (
   <nav className="navbar">
     <div className="container nav-content">
@@ -26,7 +26,7 @@ const Navbar = ({ cartCount }) => (
   </nav>
 );
 
-// Footer (Sin cambios)
+// Footer (CORREGIDO: Con tu crédito integrado)
 const Footer = () => (
   <footer className="footer">
     <div className="container footer-content">
@@ -46,10 +46,25 @@ const Footer = () => (
         </div>
       </div>
     </div>
+    
+    {/* SECCIÓN DE CRÉDITOS INTEGRADA */}
+    <div style={{
+      borderTop: '1px solid rgba(255,255,255,0.1)', // Línea divisoria sutil
+      marginTop: '30px',
+      paddingTop: '20px',
+      textAlign: 'center',
+      fontSize: '0.9rem',
+      color: '#aaa'
+    }}>
+      <p>
+        © {new Date().getFullYear()} Archi-Books. 
+        Diseño y Desarrollo por <strong>Gabriela Edwin</strong>
+      </p>
+    </div>
   </footer>
 );
 
-// Home (Ahora recibe la lista de libros real 'books' como prop)
+// Home
 const Home = ({ books, addToCart, loading }) => (
   <>
     <header className="hero">
@@ -94,10 +109,9 @@ const Home = ({ books, addToCart, loading }) => (
   </>
 );
 
-// Detalle de Producto (Busca en la lista real de libros)
+// Detalle de Producto
 const ProductDetail = ({ books, addToCart }) => {
   const { id } = useParams();
-  // Buscamos por ID de texto (Firebase) en lugar de número
   const book = books.find(b => b.id === id);
 
   if (!book) return <div className="container main-content">Cargando libro o no encontrado...</div>;
@@ -120,7 +134,7 @@ const ProductDetail = ({ books, addToCart }) => {
   );
 };
 
-// Carrito (Sin cambios en lógica, solo visual)
+// Carrito
 const Cart = ({ cart, updateQuantity, removeFromCart, clearCart }) => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const navigate = useNavigate();
@@ -211,18 +225,17 @@ const About = () => (
 // --- APP PRINCIPAL ---
 function App() {
   const [cart, setCart] = useState([]);
-  const [books, setBooks] = useState([]); // Estado para guardar los libros de Firebase
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // EFECTO: Cargar libros desde Firebase al iniciar
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const booksCollection = collection(db, "books"); // Referencia a la colección "books"
+        const booksCollection = collection(db, "books");
         const snapshot = await getDocs(booksCollection);
         const booksList = snapshot.docs.map(doc => ({
-          id: doc.id,     // Usamos el ID automático de Firebase
-          ...doc.data()   // Y los datos (title, price, img, etc.)
+          id: doc.id,
+          ...doc.data()
         }));
         setBooks(booksList);
         setLoading(false);
@@ -231,7 +244,6 @@ function App() {
         setLoading(false);
       }
     };
-
     fetchBooks();
   }, []);
 
@@ -272,12 +284,8 @@ function App() {
       <Navbar cartCount={cartCount} />
 
       <Routes>
-        {/* Pasamos 'books' y 'loading' a Home */}
         <Route path="/" element={<Home books={books} loading={loading} addToCart={addToCart} />} />
-        
-        {/* Pasamos 'books' al detalle también */}
         <Route path="/book/:id" element={<ProductDetail books={books} addToCart={addToCart} />} />
-        
         <Route path="/cart" element={
           <Cart 
             cart={cart} 
@@ -289,13 +297,21 @@ function App() {
         <Route path="/success" element={<CheckoutSuccess />} />
         <Route path="/about" element={<About />} />
       </Routes>
- {/* --- ZONA DE PRUEBAS DE PAGO (BORRAR DESPUÉS) --- */}
-      <div style={{ backgroundColor: '#fff3cd', padding: '15px', textAlign: 'center', borderBottom: '1px solid #ffeeba' }}>
-        <span style={{ marginRight: '15px', fontWeight: 'bold', color: '#856404' }}>🔧 Test de Integración:</span>
+
+      {/* --- ZONA DE PRUEBAS DE PAGO --- */}
+      <div style={{ backgroundColor: '#fff3cd', padding: '20px', textAlign: 'center', borderTop: '1px solid #ffeeba' }}>
+        <p style={{ fontWeight: 'bold', color: '#856404', marginBottom: '10px' }}>
+           ⚠️ MODO PRUEBA DE INTEGRACIÓN:
+        </p>
         <BotonPago />
+        <p style={{fontSize: '0.8rem', color: '#856404', marginTop: '10px'}}>
+           (Este botón es visible solo para demostración. No realiza cobros reales).
+        </p>
       </div>
-        {/* ------------------------------------------------ */}
+
+      {/* --- FOOTER (Con tu crédito ya incluido dentro) --- */}
       <Footer />
+
     </div>
   );
 }
